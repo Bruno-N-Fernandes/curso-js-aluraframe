@@ -1,4 +1,4 @@
-class NegociacoesView extends View {
+class NegociacaoView extends View {
 
     constructor(elemento) {
         super(elemento);
@@ -17,7 +17,7 @@ class NegociacoesView extends View {
             </thead>
             
             <tbody>
-                ${model.negociacoes.map(n => `
+                ${model.listaNegociacao.map(n => `
                     <tr>
                         <td>${DateHelper.dataParaTexto(n.data)}</td>
                         <td>${n.quantidade}</td>
