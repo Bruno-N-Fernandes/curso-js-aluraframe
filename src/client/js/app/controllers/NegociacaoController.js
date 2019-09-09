@@ -6,19 +6,14 @@ class NegociacaoController {
         this._inputQuantidade = $("#quantidade");
         this._inputValor = $("#valor");
 
-        this._negociacaoView = new NegociacaoView($('#negociacaoView'));
-        this._mensagemView = new MensagemView($('#mensagemView'));
-
-        this._listaNegociacao = new Bind(
-            new ListaNegociacao(),
-            this._negociacaoView,
-            ["adicionar", "removerTodos"]
+        this._listaNegociacao = new Bind(new ListaNegociacao(),
+            new NegociacaoView($('#negociacaoView')),
+            "adicionar", "removerTodos"
         );
 
-        this._mensagem = new Bind(
-            new Mensagem(),
-            this._mensagemView,
-            ["texto"]
+        this._mensagem = new Bind(new Mensagem(),
+            new MensagemView($('#mensagemView')),
+            "texto"
         );
     }
 
@@ -30,6 +25,7 @@ class NegociacaoController {
     }
 
     removerTodos() {
+        event.preventDefault();
         this._listaNegociacao.removerTodos();
         this._mensagem.texto = "Negociações removidas com sucesso";
     }
