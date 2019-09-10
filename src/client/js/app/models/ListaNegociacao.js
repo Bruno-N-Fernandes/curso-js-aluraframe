@@ -19,4 +19,9 @@ class ListaNegociacao {
     get total(){
         return this._listaNegociacao.reduce((total, n) => total + n.volume, 0.0);
     }
+
+    existe(negociacao) {
+        let negociacaoSerializado = JSON.stringify(negociacao);
+        return this._listaNegociacao.some(n => JSON.stringify(n) == negociacaoSerializado)
+    }
 }

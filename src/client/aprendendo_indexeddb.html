@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Document</title>
+</head>
+<body>
+    <script src="js/app/models/Negociacao.js" ></script>
+    <script>
+        var connection;
+        var openRequest = window.indexedDB.open("aluraframe", 3);
+
+        openRequest.onupgradeneeded = e => {
+            let connection = e.target.result;
+            if (connection.objectStoreNames.contains("negociacao")) {
+                connection.deleteObjectStore("negociacao");
+            }
+            connection.createObjectStore("negociacao", {autoIncrement: true});
+        };
+
+        openRequest.onsuccess = e => {
+            console.log("conexao obtida com sucesso");
+            connection = e.target.result;
+        }
+
+        openRequest.onerror = e => {
+            console.log(e.target.error);
+        }
+
+        function adiciona() {
+            let transaction = connection.transaction(["negociacao"], "readwrite");
+            let store = transaction.objectStore("negociacao");
+            let negociacao = new Negociacao(new Date(), 1, 200);
+            let request = store.add(negociacao);
+            request.onsuccess = e => {
+                console.log("Negociacao Ok");
+            };
+            request.onerror = e => {
+                console.log("Negociacao erro");
+            };
+
+        }
+
+        function listarTodos() {
+            let transaction = connection.transaction(["negociacao"], "readwrite");
+            let store = transaction.objectStore("negociacao");
+            let cursor = store.openCursor();
+            let listaNegociacao = [];
+            cursor.onsuccess = e => {
+                let atual = e.target.result;
+                if (atual){
+                    var dado = atual.value;
+                    listaNegociacao.push(new Negociacao(dado._data, dado._quantidade, dado._valor));
+                    atual.continue();
+                } else {
+                    console.log(listaNegociacao);
+                }
+            };
+        }
+
+        
+        //adiciona();
+
+
+    </script>
+</body>
+</html>

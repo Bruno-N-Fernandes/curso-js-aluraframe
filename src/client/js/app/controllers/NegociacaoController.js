@@ -15,33 +15,61 @@ class NegociacaoController {
             new MensagemView($('#mensagemView')),
             "texto"
         );
+
+        this._carregar();
+    }
+
+    _carregar() {
+        ConnectionFactory
+            .getConnection()
+            .then(connection => new NegociacaoDao(connection))
+            .then(negociacaoDao => negociacaoDao.obterTodos())
+            .then(listaNegociacao => listaNegociacao.filter(negociacao => !this._listaNegociacao.existe(negociacao)))
+            .then(listaNegociacao => listaNegociacao.forEach(negociacao => this._listaNegociacao.adicionar(negociacao)))
+            .then(this._mensagem.texto = "Negociações carregadas com sucesso")
+            .catch(erro => this.Mensagem.texto = erro);
     }
 
     importar(event) {
-
         new NegociacaoService()
             .obterNegociacoes()
-            .then(ln => ln.forEach(negociacao => this._listaNegociacao.adicionar(negociacao)))
+            .then(listaNegociacao => listaNegociacao.filter(negociacao => !this._listaNegociacao.existe(negociacao)))
+            .then(listaNegociacao => listaNegociacao.forEach(negociacao => this._listaNegociacao.adicionar(negociacao)))
+            .then(this._mensagem.texto = "Negociações importadas com sucesso")
             .catch(erro => this._mensagem.texto = erro);
     }
 
     adicionar(event) {
         event.preventDefault();
-        this._listaNegociacao.adicionar(this._criarNegociacao());
-        this._mensagem.texto = 'Negociação adicionada com sucesso';
-        this._limparFormulario();
+        let negociacao = this._criarNegociacao();
+
+        if (this._listaNegociacao.existe(negociacao)) return;
+
+        ConnectionFactory
+            .getConnection()
+            .then(connection => new NegociacaoDao(connection))
+            .then(negociacaoDao => negociacaoDao.adicionar(negociacao))
+            .then(this._listaNegociacao.adicionar(negociacao))
+            .then(this._mensagem.texto = "Negociação adicionada com sucesso")
+            .then(this._limparFormulario())
+            .catch(erro => this._mensagem.texto = erro);
     }
 
     removerTodos(event) {
-        this._listaNegociacao.removerTodos();
-        this._mensagem.texto = "Negociações removidas com sucesso";
+        ConnectionFactory
+            .getConnection()
+            .then(connection => new NegociacaoDao(connection))
+            .then(negociacaoDao => negociacaoDao.removerTodos())
+            .then(this._listaNegociacao.removerTodos())
+            .then(this._mensagem.texto = "Negociações removidas com sucesso")
+            .catch(erro => this._mensagem.texto = erro);
     }
 
     _criarNegociacao() {
         return new Negociacao(
             DateHelper.textoParaData(this._inputData.value),
-            this._inputQuantidade.value,
-            this._inputValor.value
+            parseInt(this._inputQuantidade.value),
+            parseFloat(this._inputValor.value)
         );
     }
 
