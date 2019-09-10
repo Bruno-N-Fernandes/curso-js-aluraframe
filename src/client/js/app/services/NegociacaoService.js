@@ -35,7 +35,7 @@ class NegociacaoService {
         });
     }
 
-    obterNegociacoes(listaNegociacao) {
+    importar(listaAtual) {
         
         return Promise.all([
             this.obterNegociacoesDaSemana(),
@@ -49,7 +49,7 @@ class NegociacaoService {
 
             return negociacoes;
         })
-        .then(ln => ln.filter(negociacao => !listaNegociacao.existe(negociacao)))
+        .then(ln => ln.filter(negociacao => !listaAtual.existe(negociacao)))
         .catch(erro => {
             throw new Error(erro);
         });
@@ -72,12 +72,12 @@ class NegociacaoService {
             .catch(erro => { throw new Error(erro); });
     }
 
-    obterTodos(listaNegociacao) {
+    obterTodos(listaAtual) {
         return ConnectionFactory
             .getConnection()
             .then(connection => new NegociacaoDao(connection))
             .then(negociacaoDao => negociacaoDao.obterTodos())
-            .then(ln => ln.filter(negociacao => !listaNegociacao.existe(negociacao)))
+            .then(ln => ln.filter(negociacao => !listaAtual.existe(negociacao)))
             .catch(erro => { throw new Error(erro); });
     }
 }

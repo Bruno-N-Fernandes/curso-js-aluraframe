@@ -24,4 +24,12 @@ class ListaNegociacao {
         let negociacaoSerializado = JSON.stringify(negociacao);
         return this._listaNegociacao.some(n => JSON.stringify(n) == negociacaoSerializado)
     }
+
+    ordenar(criterio) {
+        this._listaNegociacao.sort(criterio);        
+    }
+    
+    inverterOrdem() {
+        this._listaNegociacao.reverse();
+    }
 }
