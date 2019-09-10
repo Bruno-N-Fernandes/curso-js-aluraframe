@@ -19,15 +19,10 @@ class NegociacaoController {
 
     importar(event) {
 
-        var negociacaoService = new NegociacaoService();
-        negociacaoService.obterNegociacoesDaSemana((erro, listaNegociacao) => {
-            if (erro) {
-                this._mensagem.texto = erro
-            } else {
-                listaNegociacao.forEach(negociacao => this._listaNegociacao.adicionar(negociacao));
-                this._mensagem.texto = "Negociações importadas com sucesso";
-            }
-        });
+        new NegociacaoService()
+            .obterNegociacoes()
+            .then(ln => ln.forEach(negociacao => this._listaNegociacao.adicionar(negociacao)))
+            .catch(erro => this._mensagem.texto = erro);
     }
 
     adicionar(event) {
