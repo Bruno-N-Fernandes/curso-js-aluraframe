@@ -35,7 +35,7 @@ class NegociacaoService {
         });
     }
 
-    obterNegociacoes() {
+    obterNegociacoes(listaNegociacao) {
         
         return Promise.all([
             this.obterNegociacoesDaSemana(),
@@ -48,8 +48,36 @@ class NegociacaoService {
                 .map(dado => new Negociacao(new Date(dado.data), dado.quantidade, dado.valor ));
 
             return negociacoes;
-        }).catch(erro => {
+        })
+        .then(ln => ln.filter(negociacao => !listaNegociacao.existe(negociacao)))
+        .catch(erro => {
             throw new Error(erro);
         });
-	}
+    }
+    
+    incluir(negociacao) {
+        return ConnectionFactory
+            .getConnection()
+            .then(connection => new NegociacaoDao(connection))
+            .then(negociacaoDao => negociacaoDao.adicionar(negociacao))
+            .then(() => "Negociação adicionada com sucesso")
+            .catch(erro => { throw new Error(erro); });
+    }
+
+    removerTodos() {
+        return ConnectionFactory
+            .getConnection()
+            .then(connection => new NegociacaoDao(connection))
+            .then(negociacaoDao => negociacaoDao.removerTodos())
+            .catch(erro => { throw new Error(erro); });
+    }
+
+    obterTodos(listaNegociacao) {
+        return ConnectionFactory
+            .getConnection()
+            .then(connection => new NegociacaoDao(connection))
+            .then(negociacaoDao => negociacaoDao.obterTodos())
+            .then(ln => ln.filter(negociacao => !listaNegociacao.existe(negociacao)))
+            .catch(erro => { throw new Error(erro); });
+    }
 }

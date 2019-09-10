@@ -16,24 +16,24 @@ class NegociacaoController {
             "texto"
         );
 
-        this._carregar();
+        this._service = new NegociacaoService();
+
+        this._init();
     }
 
-    _carregar() {
-        ConnectionFactory
-            .getConnection()
-            .then(connection => new NegociacaoDao(connection))
-            .then(negociacaoDao => negociacaoDao.obterTodos())
-            .then(listaNegociacao => listaNegociacao.filter(negociacao => !this._listaNegociacao.existe(negociacao)))
+    _init() {
+        this._service
+            .obterTodos(this._listaNegociacao)
             .then(listaNegociacao => listaNegociacao.forEach(negociacao => this._listaNegociacao.adicionar(negociacao)))
             .then(this._mensagem.texto = "Negociações carregadas com sucesso")
             .catch(erro => this.Mensagem.texto = erro);
+
+        setInterval(() => this.importar(event), 3000);
     }
 
     importar(event) {
-        new NegociacaoService()
-            .obterNegociacoes()
-            .then(listaNegociacao => listaNegociacao.filter(negociacao => !this._listaNegociacao.existe(negociacao)))
+        this._service
+            .obterNegociacoes(this._listaNegociacao)
             .then(listaNegociacao => listaNegociacao.forEach(negociacao => this._listaNegociacao.adicionar(negociacao)))
             .then(this._mensagem.texto = "Negociações importadas com sucesso")
             .catch(erro => this._mensagem.texto = erro);
@@ -45,10 +45,8 @@ class NegociacaoController {
 
         if (this._listaNegociacao.existe(negociacao)) return;
 
-        ConnectionFactory
-            .getConnection()
-            .then(connection => new NegociacaoDao(connection))
-            .then(negociacaoDao => negociacaoDao.adicionar(negociacao))
+        this._service
+            .incluir(negociacao)
             .then(this._listaNegociacao.adicionar(negociacao))
             .then(this._mensagem.texto = "Negociação adicionada com sucesso")
             .then(this._limparFormulario())
@@ -56,10 +54,8 @@ class NegociacaoController {
     }
 
     removerTodos(event) {
-        ConnectionFactory
-            .getConnection()
-            .then(connection => new NegociacaoDao(connection))
-            .then(negociacaoDao => negociacaoDao.removerTodos())
+        this._service
+            .removerTodos()
             .then(this._listaNegociacao.removerTodos())
             .then(this._mensagem.texto = "Negociações removidas com sucesso")
             .catch(erro => this._mensagem.texto = erro);
