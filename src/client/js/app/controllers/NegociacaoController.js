@@ -17,6 +17,19 @@ class NegociacaoController {
         );
     }
 
+    importar(event) {
+
+        var negociacaoService = new NegociacaoService();
+        negociacaoService.obterNegociacoesDaSemana((erro, listaNegociacao) => {
+            if (erro) {
+                this._mensagem.texto = erro
+            } else {
+                listaNegociacao.forEach(negociacao => this._listaNegociacao.adicionar(negociacao));
+                this._mensagem.texto = "Negociações importadas com sucesso";
+            }
+        });
+    }
+
     adicionar(event) {
         event.preventDefault();
         this._listaNegociacao.adicionar(this._criarNegociacao());
@@ -24,8 +37,7 @@ class NegociacaoController {
         this._limparFormulario();
     }
 
-    removerTodos() {
-        event.preventDefault();
+    removerTodos(event) {
         this._listaNegociacao.removerTodos();
         this._mensagem.texto = "Negociações removidas com sucesso";
     }
